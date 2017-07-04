@@ -5,9 +5,24 @@ using System.Text.RegularExpressions;
 
 namespace CurpValidator
 {
+    #region enums
+
+    /// <summary>
+    /// Genres (enum)
+    /// <para> Genres allowed for CURP Generation</para>
+    /// </summary>
+    public enum Genres
+    {
+        Male = 'H',
+        Female = 'M'
+    }
+
+    #endregion
+
+    #region Classes
     /// <summary>
     /// CurpClass (Class)
-    /// <para> Clase que incluye funciones para validación y creación de los primeros 16 digitos del CURP
+    /// <para> Class Library for the creation and/or verification of the first 16 digits of the Mexican CURP (Clave Única de Registro de Población/Unique Population Registry Code)
     /// </summary>
     public class CurpClass
     {
@@ -15,15 +30,15 @@ namespace CurpValidator
         private static List<char> specialCharacters = new List<char>() { '/', '-', '.', '\\' };
 
         /// <summary>
-        /// CrearCURP
-        /// <para> Método para crear los primeros 16 digitos del CURP de acuerdo al nombre, fecha de nacimiento, sexo y entidad federativa.</para>
+        /// CreateCURP
+        /// <para> CreateCURP(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity)
         /// </summary>
-        /// <param name = "name" type = "String">Nombre CURP</param>
-        /// <param name = "pathernalLastName" type = "String">Apellido Paterno CURP</param>
-        /// <param name = "mathernalLastName" type = "String">Apellido Materno CURP</param>
-        /// <param name = "dateOfBirth" type = "DateTime">Fecha Nacimineto CURP</param>
-        /// <param name = "sex" type = "Generos">Sexo CURP</param>
-        /// <param name = "federalEntity" type = "EntidadesFederativas">Entidad Federativa CURP</param>
+        /// <param name = "name" type = "String">Names</param>
+        /// <param name = "pathernalLastName" type = "String">Pathernal Last Names</param>
+        /// <param name = "mathernalLastName" type = "String">Mathernal Last Names</param>
+        /// <param name = "dateOfBirth" type = "DateTime">Date of Birth</param>
+        /// <param name = "sex" type = "Generos">Sex</param>
+        /// <param name = "federalEntity" type = "FederalEntities">FederalEntity</param>
         /// <returns> String </returns>
         public static String CreateCURP(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity)
         {
@@ -73,95 +88,13 @@ namespace CurpValidator
         }
 
         /// <summary>
-        /// CrearCURP
-        /// <para> Método para verificar los primeros 16 digitos del CURP de acuerdo al nombre, fecha de nacimiento, sexo y entidad federativa.</para>
+        /// CreateLastNameCurpDigits(String lastName, out String curpDigit1_3, out char curpDigit14_15, bool isPaternalLastName = false)
+        /// <para> Method to create CURP digits 1 through 3 and 14 and 15 from the given last name .</para>
         /// </summary>
-        /// <param name = "name" type = "String">Nombre CURP</param>
-        /// <param name = "apellidoPaterno" type = "String">Apellido Paterno CURP</param>
-        /// <param name = "apellidoMaterno" type = "String">Apellido Materno CURP</param>
-        /// <param name = "fechaNacimiento" type = "DateTime">Fecha Nacimineto CURP</param>
-        /// <param name = "sexo" type = "Generos">Sexo CURP</param>
-        /// <param name = "entidadFederativa" type = "EntidadesFederativas">Entidad Federativa CURP</param>
-        /// <param name = "curp" type = "String">CURP con 16 digitos a validar</param>
-        /// <returns> bool </returns>
-        public static bool ValidateCurp(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity, String curpToValidate)
-        {
-            try
-            {
-                return CreateCURP(name, pathernalLastName, mathernalLastName, dateOfBirth, sex, federalEntity) == curpToValidate;
-            }
-            catch (CurpGenerationErrorException e)
-            {
-
-                throw e;
-            }
-        }
-
-        /// <summary>
-        /// CoincideNombreCompletoConCurp
-        /// <para> Método para verificar los digitos correspondientes al nombre, apellido paterno y apellido materno del CURP especificado.</para>
-        /// </summary>
-        /// <param name = "name" type = "String">Nombre a validar</param>
-        /// <param name = "pathernalLastName" type = "String">Apellido Paterno  a validar</param>
-        /// <param name = "mathernalLastName" type = "String">Apellido Materno  a validar</param>
-        /// <param name = "curp" type = "String">CURP con 16 digitos a validar</param>
-        /// <returns> bool </returns>
-        public static bool FullNameMatchesCurp(String name, String pathernalLastName, String mathernalLastName, String curp)
-        {
-            try
-            {
-                String curpDigitCurp1_4 = curp.Substring(0, 4);
-                String curpDigitCurp14_16 = curp.Substring(13, 3);
-                String curpDigitValidation1_4 = "";
-                String curpDigitValidation14_16 = "";
-
-                name = FormatCurpText(name.ToUpper());
-                pathernalLastName = FormatCurpText(pathernalLastName.ToUpper());
-                mathernalLastName = FormatCurpText(mathernalLastName.ToUpper());
-
-                char curpDigit14 = new char();
-                CreateLastNameCurpDigits(pathernalLastName, out String curpDigit1_2, out curpDigit14, true);
-
-                String curpDigit3 = "";
-                char curpDigit15 = new char();
-
-                if (!string.IsNullOrEmpty(mathernalLastName))
-                {
-                    CreateLastNameCurpDigits(mathernalLastName, out curpDigit3, out curpDigit15);
-                }
-                else
-                {
-                    curpDigit3 = "X";
-                    curpDigit15 = 'X';
-                }
-
-                char curpDigit4 = new char();
-                char curpDigit16 = new char();
-                CreateNameCurpDigits(name, out curpDigit4, out curpDigit16);
-
-                curpDigitValidation1_4 = curpDigit1_2 + curpDigit3 + curpDigit4;
-                curpDigitValidation14_16 = curpDigit14.ToString() + curpDigit15 + curpDigit16;
-
-
-                curpDigitValidation1_4 = ValidateAndModifySonorousWords(curpDigitValidation1_4);
-
-                return curpDigitCurp1_4 == curpDigitValidation1_4 && curpDigitCurp14_16 == curpDigitValidation14_16;
-            }
-            catch (CurpGenerationErrorException e)
-            {
-
-                throw e;
-            }
-        }
-
-        /// <summary>
-        /// FormarParteApellidoCurp
-        /// <para> Método para crear los digitos 1 a 3, y 14 y 15 del Curp a partir del apellido solicitado .</para>
-        /// </summary>
-        /// <param name = "lastName" type = "String">Apellido base</param>
-        /// <param name = "curpDigit1_3" type = " out String">Variable de salida con la curpDigiticion 1 y 2 si es paterno, y 3 si es materno del CURP</param>
-        /// <param name = "curpDigit14_15" type = "out char">Variable de salida con la curpDigiticion 14 si es paterno, y 15 si es materno del CURP</param>
-        /// <param name = "isPaternalLastName" type = "bool">Booleano que especifica si el apellido dado es paterno.</param>
+        /// <param name = "lastName" type = "String">Given Last Name</param>
+        /// <param name = "curpDigit1_3" type = " out String">Out Variable including CURP digit 1 and 2 if it's a paternal last name and 3 if it's mathernal last name</param>
+        /// <param name = "curpDigit14_15" type = "out char">Out Variable including CURP digit 14 if it's a paternal last name and 15 if it's mathernal last name</param>
+        /// <param name = "isPaternalLastName" type = "bool">Boolean that specifies if the given last name is paternal or not.</param>
         /// <returns> void </returns>
         private static void CreateLastNameCurpDigits(String lastName, out String curpDigit1_3, out char curpDigit14_15, bool isPaternalLastName = false)
         {
@@ -221,12 +154,12 @@ namespace CurpValidator
         }
 
         /// <summary>
-        /// FormarParteNombreCurp
-        /// <para> Método para crear los digitos 4 y 16 del Curp a partir del nombre solicitado .</para>
+        /// CreateNameCurpDigits(String name, out char curpDigit4, out char curpDigit16)
+        /// <para> Method for the creation of the 4th and 16th CURP digits from a given name.</para>
         /// </summary>
-        /// <param name = "name" type = "String">Apellido base</param>
-        /// <param name = "curpDigit4" type = " out char">Variable de salida con la curpDigiticion 4 del CURP</param>
-        /// <param name = "curpDigit16" type = "out char">Variable de salida con la curpDigiticion 16 del CURP</param>
+        /// <param name = "name" type = "String">Name</param>
+        /// <param name = "curpDigit4" type = " out char">Out variable including CURP digit 4</param>
+        /// <param name = "curpDigit16" type = "out char">Out variable including CURP digit 16</param>
         /// <returns> void </returns>
         private static void CreateNameCurpDigits(String name, out char curpDigit4, out char curpDigit16)
         {
@@ -275,8 +208,115 @@ namespace CurpValidator
         }
 
         /// <summary>
-        /// EsVocal
-        /// <para> Método para verificar si la letra es vocal.</para>
+        /// FormatCurpText(String input)
+        /// <para> Method to format the given text to meet the CURP generation criteria. </para>
+        /// </summary>
+        /// <param name="input" type = "String">Letra a Validar</param>
+        /// <returns> String </returns>
+        private static String FormatCurpText(String input)
+        {
+
+            try
+            {
+                List<String> prepositionConjunctionContraction = new List<String>() { "DA", "DAS", "DE", "DEL", "DER", "DI", "DIE", "DD",
+                "EL", "LA", "LOS", "LAS", "LE", "LES", "MAC", "MC", "VAN", "VON", "Y" };
+
+                input = RemoveDierecisAndAccents(input.ToUpper());
+                while (input.Contains("  "))
+                {
+                    input = input.Replace("  ", " ");
+                }
+
+                var compountInput = input.Split(' ').ToList();
+                if (compountInput.Count > 0)
+                {
+                    List<String> wordsToErase = new List<String>();
+                    foreach (var compoundText in compountInput)
+                    {
+                        if (prepositionConjunctionContraction.Contains(compoundText))
+                        {
+                            wordsToErase.Add(compoundText);
+                        }
+                    }
+                    foreach (var word in wordsToErase)
+                    {
+                        compountInput.Remove(word);
+                    }
+                    return String.Join(" ", compountInput);
+                }
+                else
+                {
+                    return input;
+                }
+            }
+            catch (CurpGenerationErrorException e)
+            {
+
+                throw e;
+            }
+        }
+
+
+        /// <summary>
+        /// FullNameMatchesCurp(String name, String pathernalLastName, String mathernalLastName, String curp)
+        /// <para> Method to verify if the given person fullname matches the given curp.</para>
+        /// </summary>
+        /// <param name = "name" type = "String">Names</param>
+        /// <param name = "pathernalLastName" type = "String">Pathernal Last Names</param>
+        /// <param name = "mathernalLastName" type = "String">Mathernal Last Names</param>
+        /// <param name = "curp" type = "String">CURP con 16 digitos a validar</param>
+        /// <returns> bool </returns>
+        public static bool FullNameMatchesCurp(String name, String pathernalLastName, String mathernalLastName, String curp)
+        {
+            try
+            {
+                String curpDigitCurp1_4 = curp.Substring(0, 4);
+                String curpDigitCurp14_16 = curp.Substring(13, 3);
+                String curpDigitValidation1_4 = "";
+                String curpDigitValidation14_16 = "";
+
+                name = FormatCurpText(name.ToUpper());
+                pathernalLastName = FormatCurpText(pathernalLastName.ToUpper());
+                mathernalLastName = FormatCurpText(mathernalLastName.ToUpper());
+
+                char curpDigit14 = new char();
+                CreateLastNameCurpDigits(pathernalLastName, out String curpDigit1_2, out curpDigit14, true);
+
+                String curpDigit3 = "";
+                char curpDigit15 = new char();
+
+                if (!string.IsNullOrEmpty(mathernalLastName))
+                {
+                    CreateLastNameCurpDigits(mathernalLastName, out curpDigit3, out curpDigit15);
+                }
+                else
+                {
+                    curpDigit3 = "X";
+                    curpDigit15 = 'X';
+                }
+
+                char curpDigit4 = new char();
+                char curpDigit16 = new char();
+                CreateNameCurpDigits(name, out curpDigit4, out curpDigit16);
+
+                curpDigitValidation1_4 = curpDigit1_2 + curpDigit3 + curpDigit4;
+                curpDigitValidation14_16 = curpDigit14.ToString() + curpDigit15 + curpDigit16;
+
+
+                curpDigitValidation1_4 = ValidateAndModifySonorousWords(curpDigitValidation1_4);
+
+                return curpDigitCurp1_4 == curpDigitValidation1_4 && curpDigitCurp14_16 == curpDigitValidation14_16;
+            }
+            catch (CurpGenerationErrorException e)
+            {
+
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// IsLetterVowel(char letter)
+        /// <para> Method to verify if the given letter is a vowel.</para>
         /// </summary>
         /// <param name = "letter" type = "char">Letra a Validar</param>
         /// <returns> bool </returns>
@@ -294,8 +334,8 @@ namespace CurpValidator
         }
 
         /// <summary>
-        /// QuitarDierecisYAcentos
-        /// <para> Método para eliminar dieresis y acentos del string dado.</para>
+        /// RemoveDierecisAndAccents(String input)
+        /// <para> Method to remove Diereseis and Accents from a given text.</para>
         /// </summary>
         /// <param name="input" type = "String">Letra a Validar</param>
         /// <returns> String </returns>
@@ -323,46 +363,22 @@ namespace CurpValidator
         }
 
         /// <summary>
-        /// FormatearTextoCurp
-        /// <para> Método para identificar si el texto ingresado forma un nombre o apellido compuesto y remueve las precurpDigiticiones, conjunciones y contracciones de esta.</para>
+        /// ValidateCurp(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity, String curpToValidate)
+        /// <para> Method for the validation of the first 16 digits of CURP using person fullname, date of birth, sex and it's federal entity o origin, against a given CURP.</para>
         /// </summary>
-        /// <param name="input" type = "String">Letra a Validar</param>
-        /// <returns> String </returns>
-        private static String FormatCurpText(String input)
+        /// <param name = "name" type = "String">Names</param>
+        /// <param name = "pathernalLastName" type = "String">Pathernal Last Names</param>
+        /// <param name = "mathernalLastName" type = "String">Mathernal Last Names</param>
+        /// <param name = "dateOfBirth" type = "DateTime">Date of Birth</param>
+        /// <param name = "sex" type = "Generos">Sex</param>
+        /// <param name = "federalEntity" type = "FederalEntities">FederalEntity</param>
+        /// <param name = "curpToValidate" type = "String">CURP input for validation</param>
+        /// <returns> bool </returns>
+        public static bool ValidateCurp(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity, String curpToValidate)
         {
-
             try
             {
-                List<String> precurpDigititionConjunctionContraction = new List<String>() { "DA", "DAS", "DE", "DEL", "DER", "DI", "DIE", "DD",
-                "EL", "LA", "LOS", "LAS", "LE", "LES", "MAC", "MC", "VAN", "VON", "Y" };
-
-                input = RemoveDierecisAndAccents(input.ToUpper());
-                while (input.Contains("  "))
-                {
-                    input = input.Replace("  ", " ");
-                }
-
-                var compountInput = input.Split(' ').ToList();
-                if (compountInput.Count > 0)
-                {
-                    List<String> wordsToErase = new List<String>();
-                    foreach (var compoundText in compountInput)
-                    {
-                        if (precurpDigititionConjunctionContraction.Contains(compoundText))
-                        {
-                            wordsToErase.Add(compoundText);
-                        }
-                    }
-                    foreach (var word in wordsToErase)
-                    {
-                        compountInput.Remove(word);
-                    }
-                    return String.Join(" ", compountInput);
-                }
-                else
-                {
-                    return input;
-                }
+                return CreateCURP(name, pathernalLastName, mathernalLastName, dateOfBirth, sex, federalEntity) == curpToValidate.Substring(0, 16);
             }
             catch (CurpGenerationErrorException e)
             {
@@ -372,8 +388,8 @@ namespace CurpValidator
         }
 
         /// <summary>
-        /// ValidarYModificarAntisonante
-        /// <para> Método para identificar si el texto dado es una palabra antisonante, y modificarla si esta lo es.</para>
+        /// ValidateAndModifySonorousWords(String input)
+        /// <para> Method to identify sonorous words according to the RENAPO regulation.</para>
         /// </summary>
         /// <param name="input" type = "String">Letra a Validar</param>
         /// <returns> String </returns>
@@ -413,17 +429,8 @@ namespace CurpValidator
     } // public class ValidationCurp
 
     /// <summary>
-    /// Generos (enum)
-    /// <para> Enumeración incluyendo los generos permitidos para la generación del CURP</para>
-    /// </summary>
-    public enum Genres
-    {
-        Male = 'H',
-        Female = 'M'
-    }
-    /// <summary>
-    /// EntidadesFederativas (Class)
-    /// <para> Clase para especificar la Entidad Federativa a la cuál pertence la persona del CURP</para>
+    /// FederalEntities (Class)
+    /// <para> Class to specify the Federal Entity that a person belongs from.</para>
     /// </summary>
     public class FederalEntities
     {
@@ -466,6 +473,10 @@ namespace CurpValidator
         public static FederalEntities Zacatecas { get { return new FederalEntities("ZS"); } }
         public static FederalEntities NacidoExtranjero { get { return new FederalEntities("NE"); } }
     }
+    /// <summary>
+    /// CurpGenerationErrorException (Class)
+    /// <para> Custom Exception Class.</para>
+    /// </summary>
     public class CurpGenerationErrorException : Exception
     {
         public CurpGenerationErrorException()
@@ -483,4 +494,6 @@ namespace CurpValidator
         public CurpGenerationErrorException(string format, Exception innerException, params object[] args)
             : base(string.Format(format, args), innerException) { }
     }
+    #endregion
+
 } // namespace ValidadorCurp
