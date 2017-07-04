@@ -26,66 +26,16 @@ namespace CurpValidator
     /// </summary>
     public class CurpClass
     {
+        #region Private Variables
 
         private static List<char> specialCharacters = new List<char>() { '/', '-', '.', '\\' };
 
-        /// <summary>
-        /// CreateCURP
-        /// <para> CreateCURP(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity)
-        /// </summary>
-        /// <param name = "name" type = "String">Names</param>
-        /// <param name = "pathernalLastName" type = "String">Pathernal Last Names</param>
-        /// <param name = "mathernalLastName" type = "String">Mathernal Last Names</param>
-        /// <param name = "dateOfBirth" type = "DateTime">Date of Birth</param>
-        /// <param name = "sex" type = "Generos">Sex</param>
-        /// <param name = "federalEntity" type = "FederalEntities">FederalEntity</param>
-        /// <returns> String </returns>
-        public static String CreateCURP(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity)
-        {
-            try
-            {
+        #endregion
 
-                name = FormatCurpText(name.ToUpper());
-                pathernalLastName = FormatCurpText(pathernalLastName.ToUpper());
-                mathernalLastName = FormatCurpText(mathernalLastName.ToUpper());
+        #region Public Variables
+        #endregion
 
-                char curpDigit14 = new char();
-                CreateLastNameCurpDigits(pathernalLastName, out String curpDigit1_2, out curpDigit14, true);
-
-                String curpDigit3 = "";
-                char curpDigit15 = new char();
-
-                if (!string.IsNullOrEmpty(mathernalLastName))
-                {
-                    CreateLastNameCurpDigits(mathernalLastName, out curpDigit3, out curpDigit15);
-                }
-                else
-                {
-                    curpDigit3 = "X";
-                    curpDigit15 = 'X';
-                }
-
-                char curpDigit4 = new char();
-                char curpDigit16 = new char();
-                CreateNameCurpDigits(name, out curpDigit4, out curpDigit16);
-
-                String curpDigit1_4 = ValidateAndModifySonorousWords(curpDigit1_2 + curpDigit3 + curpDigit4);
-                String curpDigit5_10 = dateOfBirth.ToString("yy") + dateOfBirth.ToString("MM") + dateOfBirth.ToString("dd");
-                String curpDigit11 = Convert.ToChar(sex).ToString();
-                String curpDigit12_13 = federalEntity.StateName;
-                String curpDigit14_16 = curpDigit14.ToString() + curpDigit15 + curpDigit16;
-
-
-
-
-                return curpDigit1_4 + curpDigit5_10 + curpDigit11 + curpDigit12_13 + curpDigit14_16;
-            }
-            catch (CurpGenerationErrorException e)
-            {
-
-                throw e;
-            }
-        }
+        #region Private Methods
 
         /// <summary>
         /// CreateLastNameCurpDigits(String lastName, out String curpDigit1_3, out char curpDigit14_15, bool isPaternalLastName = false)
@@ -256,6 +206,155 @@ namespace CurpValidator
             }
         }
 
+        /// <summary>
+        /// IsLetterVowel(char letter)
+        /// <para> Method to verify if the given letter is a vowel.</para>
+        /// </summary>
+        /// <param name = "letter" type = "char">Letra a Validar</param>
+        /// <returns> bool </returns>
+        private static bool IsLetterVowel(char letter)
+        {
+            try
+            {
+                return "aeiou".IndexOf(letter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
+            }
+            catch (CurpGenerationErrorException e)
+            {
+
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// RemoveDierecisAndAccents(String input)
+        /// <para> Method to remove Diereseis and Accents from a given text.</para>
+        /// </summary>
+        /// <param name="input" type = "String">Letra a Validar</param>
+        /// <returns> String </returns>
+        private static String RemoveDierecisAndAccents(String input)
+        {
+            try
+            {
+                Regex a = new Regex("[Á|À|Ä|Â]", RegexOptions.Compiled);
+                Regex e = new Regex("[É|È|Ë|Ê]", RegexOptions.Compiled);
+                Regex i = new Regex("[Í|Ì|Ï|Î]", RegexOptions.Compiled);
+                Regex o = new Regex("[Ó|Ò|Ö|Ô]", RegexOptions.Compiled);
+                Regex u = new Regex("[Ú|Ù|Ü|Û]", RegexOptions.Compiled);
+                input = a.Replace(input, "A");
+                input = e.Replace(input, "E");
+                input = i.Replace(input, "I");
+                input = o.Replace(input, "O");
+                input = u.Replace(input, "U");
+                return input;
+            }
+            catch (CurpGenerationErrorException e)
+            {
+
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// ValidateAndModifySonorousWords(String input)
+        /// <para> Method to identify sonorous words according to the RENAPO regulation.</para>
+        /// </summary>
+        /// <param name="input" type = "String">Letra a Validar</param>
+        /// <returns> String </returns>
+        private static String ValidateAndModifySonorousWords(String input)
+        {
+            try
+            {
+                List<String> sonorousWords = new List<String>()
+                {
+                "BACA", "BAKA", "BUEI", "BUEY",
+                "CACA", "CACO", "CAGA", "CAGO", "CAKA", "CAKO", "COGE", "COGI", "COJA", "COJE", "COJI", "COJO", "COLA", "CULO",
+                "FALO", "FETO",
+                "GETA", "GUEI", "GUEY",
+                "JETA", "JOTO",
+                "KACA", "KACO", "KAGA", "KAGO", "KAKA", "KAKO", "KOGE", "KOGI", "KOJA", "KOJE", "KOJI", "KOJO", "KOLA", "KULO",
+                "LILO", "LOCA", "LOCO", "LOKA", "LOKO",
+                "MAME", "MAMO", "MEAR", "MEAS", "MEON", "MIAR", "MION", "MOCO", "MOKO", "MULA", "MULO",
+                "NACA", "NACO",
+                "PEDA", "PEDO", "PENE", "PIPI", "PITO", "POPO", "PUTA", "PUTO",
+                "QULO",
+                "RATA", "ROBA", "ROBE", "ROBO", "RUIN",
+                "SENO",
+                "TETA",
+                "VACA", "VAGA", "VAGO", "VAKA", "VUEI", "VUEY",
+                "WUEI", "WUEY"
+                };
+
+                return sonorousWords.Contains(input) ? input.Replace(input[1], 'X') : input;
+            }
+            catch (CurpGenerationErrorException e)
+            {
+
+                throw e;
+            }
+        }
+
+        #endregion
+
+
+        #region Public Methods
+
+        /// <summary>
+        /// CreateCURP
+        /// <para> CreateCURP(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity)
+        /// </summary>
+        /// <param name = "name" type = "String">Names</param>
+        /// <param name = "pathernalLastName" type = "String">Pathernal Last Names</param>
+        /// <param name = "mathernalLastName" type = "String">Mathernal Last Names</param>
+        /// <param name = "dateOfBirth" type = "DateTime">Date of Birth</param>
+        /// <param name = "sex" type = "Generos">Sex</param>
+        /// <param name = "federalEntity" type = "FederalEntities">FederalEntity</param>
+        /// <returns> String </returns>
+        public static String CreateCURP(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity)
+        {
+            try
+            {
+
+                name = FormatCurpText(name.ToUpper());
+                pathernalLastName = FormatCurpText(pathernalLastName.ToUpper());
+                mathernalLastName = FormatCurpText(mathernalLastName.ToUpper());
+
+                char curpDigit14 = new char();
+                CreateLastNameCurpDigits(pathernalLastName, out String curpDigit1_2, out curpDigit14, true);
+
+                String curpDigit3 = "";
+                char curpDigit15 = new char();
+
+                if (!string.IsNullOrEmpty(mathernalLastName))
+                {
+                    CreateLastNameCurpDigits(mathernalLastName, out curpDigit3, out curpDigit15);
+                }
+                else
+                {
+                    curpDigit3 = "X";
+                    curpDigit15 = 'X';
+                }
+
+                char curpDigit4 = new char();
+                char curpDigit16 = new char();
+                CreateNameCurpDigits(name, out curpDigit4, out curpDigit16);
+
+                String curpDigit1_4 = ValidateAndModifySonorousWords(curpDigit1_2 + curpDigit3 + curpDigit4);
+                String curpDigit5_10 = dateOfBirth.ToString("yy") + dateOfBirth.ToString("MM") + dateOfBirth.ToString("dd");
+                String curpDigit11 = Convert.ToChar(sex).ToString();
+                String curpDigit12_13 = federalEntity.StateName;
+                String curpDigit14_16 = curpDigit14.ToString() + curpDigit15 + curpDigit16;
+
+
+
+
+                return curpDigit1_4 + curpDigit5_10 + curpDigit11 + curpDigit12_13 + curpDigit14_16;
+            }
+            catch (CurpGenerationErrorException e)
+            {
+
+                throw e;
+            }
+        }
 
         /// <summary>
         /// FullNameMatchesCurp(String name, String pathernalLastName, String mathernalLastName, String curp)
@@ -315,54 +414,6 @@ namespace CurpValidator
         }
 
         /// <summary>
-        /// IsLetterVowel(char letter)
-        /// <para> Method to verify if the given letter is a vowel.</para>
-        /// </summary>
-        /// <param name = "letter" type = "char">Letra a Validar</param>
-        /// <returns> bool </returns>
-        private static bool IsLetterVowel(char letter)
-        {
-            try
-            {
-                return "aeiou".IndexOf(letter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
-            }
-            catch (CurpGenerationErrorException e)
-            {
-
-                throw e;
-            }
-        }
-
-        /// <summary>
-        /// RemoveDierecisAndAccents(String input)
-        /// <para> Method to remove Diereseis and Accents from a given text.</para>
-        /// </summary>
-        /// <param name="input" type = "String">Letra a Validar</param>
-        /// <returns> String </returns>
-        private static String RemoveDierecisAndAccents(String input)
-        {
-            try
-            {
-                Regex a = new Regex("[Á|À|Ä|Â]", RegexOptions.Compiled);
-                Regex e = new Regex("[É|È|Ë|Ê]", RegexOptions.Compiled);
-                Regex i = new Regex("[Í|Ì|Ï|Î]", RegexOptions.Compiled);
-                Regex o = new Regex("[Ó|Ò|Ö|Ô]", RegexOptions.Compiled);
-                Regex u = new Regex("[Ú|Ù|Ü|Û]", RegexOptions.Compiled);
-                input = a.Replace(input, "A");
-                input = e.Replace(input, "E");
-                input = i.Replace(input, "I");
-                input = o.Replace(input, "O");
-                input = u.Replace(input, "U");
-                return input;
-            }
-            catch (CurpGenerationErrorException e)
-            {
-
-                throw e;
-            }
-        }
-
-        /// <summary>
         /// ValidateCurp(String name, String pathernalLastName, String mathernalLastName, DateTime dateOfBirth, Genres sex, FederalEntities federalEntity, String curpToValidate)
         /// <para> Method for the validation of the first 16 digits of CURP using person fullname, date of birth, sex and it's federal entity o origin, against a given CURP.</para>
         /// </summary>
@@ -387,44 +438,12 @@ namespace CurpValidator
             }
         }
 
-        /// <summary>
-        /// ValidateAndModifySonorousWords(String input)
-        /// <para> Method to identify sonorous words according to the RENAPO regulation.</para>
-        /// </summary>
-        /// <param name="input" type = "String">Letra a Validar</param>
-        /// <returns> String </returns>
-        private static String ValidateAndModifySonorousWords(String input)
-        {
-            try
-            {
-                List<String> sonorousWords = new List<String>()
-                {
-                "BACA", "BAKA", "BUEI", "BUEY",
-                "CACA", "CACO", "CAGA", "CAGO", "CAKA", "CAKO", "COGE", "COGI", "COJA", "COJE", "COJI", "COJO", "COLA", "CULO",
-                "FALO", "FETO",
-                "GETA", "GUEI", "GUEY",
-                "JETA", "JOTO",
-                "KACA", "KACO", "KAGA", "KAGO", "KAKA", "KAKO", "KOGE", "KOGI", "KOJA", "KOJE", "KOJI", "KOJO", "KOLA", "KULO",
-                "LILO", "LOCA", "LOCO", "LOKA", "LOKO",
-                "MAME", "MAMO", "MEAR", "MEAS", "MEON", "MIAR", "MION", "MOCO", "MOKO", "MULA", "MULO",
-                "NACA", "NACO",
-                "PEDA", "PEDO", "PENE", "PIPI", "PITO", "POPO", "PUTA", "PUTO",
-                "QULO",
-                "RATA", "ROBA", "ROBE", "ROBO", "RUIN",
-                "SENO",
-                "TETA",
-                "VACA", "VAGA", "VAGO", "VAKA", "VUEI", "VUEY",
-                "WUEI", "WUEY"
-                };
+        #endregion
 
-                return sonorousWords.Contains(input) ? input.Replace(input[1], 'X') : input;
-            }
-            catch (CurpGenerationErrorException e)
-            {
 
-                throw e;
-            }
-        }
+
+
+        
 
     } // public class ValidationCurp
 
