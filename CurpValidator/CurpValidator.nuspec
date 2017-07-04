@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Carretero.CURP.Validator.Library</id>
+    <version>1.0.0</version>
+    <title>CURP - Validator Library</title>
+    <authors>Diego Carretero Alvarez</authors>
+    <owners>Diego Carretero Alvarez</owners>
+    <licenseUrl>https://github.com/DCarretero59/CurpValidator/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/DCarretero59/CurpValidator</projectUrl>
+    <iconUrl>http://github.com/contoso/UsefulStuff/nuget_icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Library for the creation and/or verification of the first 16 digits of the Mexican CURP (Clave Única de Registro de Población/Unique Population Registry Code)</description>
+    <releaseNotes>Create library for Mexican CURP Validation</releaseNotes>
+    <copyright>Copyright 2017 - Diego Carretero</copyright>
+    <tags>CURP Mexico</tags>
+  </metadata>
+</package>
